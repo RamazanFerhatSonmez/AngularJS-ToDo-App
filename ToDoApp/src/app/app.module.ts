@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
+import { FormsModule } from '@angular/forms';
 import {  MatCheckboxModule,
           MatButtonModule,
           MatInputModule,
@@ -30,6 +31,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
     MatInputModule,
     MatCardModule,
     DragDropModule,
+    FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'about', component: AboutComponent },
