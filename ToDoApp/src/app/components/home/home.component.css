@@ -17,7 +17,20 @@
   overflow: hidden;
   display: block;
 }
-
+.example-box .todo-title {
+  flex: 1;
+}
+.example-box:hover .button{
+  opacity: 1;
+  
+}
+.example-box .button{
+  opacity: 0;
+}
+.example-box .button button {
+  height: 24px;
+  line-height: 24px;
+}
 .example-box {
   padding: 20px 10px;
   border-bottom: solid 1px #ccc;

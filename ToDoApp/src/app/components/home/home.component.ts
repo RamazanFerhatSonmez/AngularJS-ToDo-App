@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { TodoService } from '../../services/todo.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -8,32 +10,16 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag
 export class HomeComponent implements OnInit {
 
 
+  data = {};
 
 
-  data = {
-    pendings : [
-      'Get to work',
-      'Pick up groceries',
-      'Go home',
-      'Fall asleep'
-    ],
-    inProgress : [
-      'Get up',
-      'Brush teeth',
-      'Take a shower',
-      'Check e-mail',
-      'Walk dog'
-    ],
-    done: [
-      'Get up',
-      'Brush teeth',
-      'Take a shower'
-    ]
-  }
-  constructor() { }
+  constructor(
+    private todoServices: TodoService,
+    private _snackBar: MatSnackBar
+  ) { }
 
   ngOnInit() {
-    this.setItems();
+    this.getAllTodo();
   }
   drop(event: CdkDragDrop<string[]>) {
     debugger
@@ -41,31 +27,60 @@ export class HomeComponent implements OnInit {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
-
-      Object.keys(this.data).forEach(key => {
-          localStorage.setItem(key,JSON.stringify(this.data[key]));
-      });                   
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex);
+      this.updateTodo();
     }
   }
   addTodo(todo) {
-    debugger
-    console.log(todo);
-    this.data['pendings'].push(todo.value);
-    localStorage.setItem('pendings',JSON.stringify(this.data.pendings));
+    const obj = {
+      todo: todo.value
+    };
+    this.todoServices.addTodo(obj)
+      .subscribe((res) => {
+        console.log(res);
+        this._snackBar.open("Ekleme Başarılı","", {
+          duration: 2000,
+        });
+      }, (err) => {
+        console.log(err);
+      });
     todo.value = "";
+    this.getAllTodo();
   }
-
-  setItems(){
-    Object.keys(this.data).forEach(key => {
-      if(!localStorage.getItem(key)){
-        localStorage.setItem(key,JSON.stringify(this.data[key]));
-      }else{
-        this.data[key] = JSON.parse(localStorage.getItem(key));
-      }
-    });
+  getAllTodo() {
+    this.todoServices.getAllTodos()
+      .subscribe((res) => {
+        debugger
+        Object.keys(res).forEach((key) => {
+          this.data[key] = res[key];
+        });
+      }, (err) => {
+        debugger
+        console.log(err);
+      });
+  }
+  updateTodo() {
+    this.todoServices.updateTodo(this.data)
+      .subscribe((res) => {
+        this.getAllTodo();
+      }, (err) => {
+        debugger
+        console.log(err);
+      });
+  }
+  removeTodo(id) {
+    debugger
+    this.todoServices.removeTodo(id)
+      .subscribe((res) => {
+        this._snackBar.open("Silme Başarılı","", {
+          duration: 2000,
+        });
+        this.getAllTodo();
+      }, (err) => {
+        
+      });
   }
 
 }
